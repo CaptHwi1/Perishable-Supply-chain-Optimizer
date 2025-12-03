@@ -32,8 +32,8 @@ A comprehensive, market-ready application for optimizing perishable product dist
 ## Installation
 
 ```bash
-git clone https://https://github.com/CaptHwi1/Supply-chain-Optimizer.git
-cd Supply-chain-Optimizer.git
+git clone https://https://github.com/CaptHwi1/Perishable-Supply-chain-Optimizer.git
+cd Perishable-Supply-chain-Optimizer.git
 
 # Create virtual environment
 python -m venv venv
