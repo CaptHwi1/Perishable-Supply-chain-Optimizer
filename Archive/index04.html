@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perishable Supply Chain Optimizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #d32f2f;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #c62828;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #d32f2f;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #eee;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Perishable Supply Chain Enterprise Optimizer</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('config')">Configuration</div>
+            <div class="tab" onclick="showTab('results')">Results</div>
+        </div>
+        
+        <div id="config" class="tab-content active">
+            <div class="card">
+                <h2>Global Settings</h2>
+                <div class="form-group">
+                    <label>Simulation Days:</label>
+                    <input type="number" id="simDays" value="28">
+                </div>
+                <div class="form-group">
+                    <label>Transport Rate ($/km/unit):</label>
+                    <input type="number" id="transportRate" value="0.01" step="0.001">
+                </div>
+                <button onclick="applySettings()">Apply Settings</button>
+            </div>
+            
+            <div class="card">
+                <h2>Products</h2>
+                <div class="form-group">
+                    <label>Product Name:</label>
+                    <input type="text" id="productName">
+                </div>
+                <div class="form-group">
+                    <label>Shelf Life (days):</label>
+                    <input type="number" id="shelfLife" min="1">
+                </div>
+                <button onclick="addProduct()">Add Product</button>
+                
+                <h3>Configured Products:</h3>
+                <ul id="productList"></ul>
+                <button onclick="removeProduct()">Remove Selected</button>
+                <button onclick="clearProducts()">Clear All</button>
+            </div>
+            
+            <div class="card">
+                <h2>Distributors</h2>
+                <div class="form-group">
+                    <label>Distributor Name:</label>
+                    <input type="text" id="distName">
+                </div>
+                <div class="form-group">
+                    <label>Policy (days):</label>
+                    <input type="number" id="policyDays" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Proportion:</label>
+                    <input type="number" id="proportion" value="0.15" min="0.01" max="1" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Distance (km):</label>
+                    <input type="number" id="distance" value="10" min="1">
+                </div>
+                <button onclick="addDistributor()">Add Distributor</button>
+                
+                <h3>Configured Distributors:</h3>
+                <ul id="distributorList"></ul>
+                <button onclick="removeDistributor()">Remove Selected</button>
+                <button onclick="clearDistributors()">Clear All</button>
+            </div>
+            
+            <div class="card">
+                <h2>Actions</h2>
+                <button onclick="runSimulation()" style="background-color: #4caf50;">Run Simulation</button>
+                <button onclick="optimizeProduction()" style="background-color: #2196f3;">Optimize Production</button>
+                <button onclick="exportResults()" style="background-color: #ff9800;">Export Results</button>
+            </div>
+        </div>
+        
+        <div id="results" class="tab-content">
+            <div class="card">
+                <h2>Simulation Results</h2>
+                <p>This is where the results would be displayed after running the simulation.</p>
+                <p>No simulation has been run yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript functions that are less likely to cause errors
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function applySettings() {
+            alert('Settings applied!');
+        }
+
+        function addProduct() {
+            const name = document.getElementById('productName').value;
+            const shelfLife = document.getElementById('shelfLife').value;
+            
+            if (!name || !shelfLife) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const li = document.createElement('li');
+            li.textContent = `${name} (Shelf life: ${shelfLife} days)`;
+            li.onclick = function() {
+                this.classList.toggle('selected');
+            };
+            document.getElementById('productList').appendChild(li);
+            
+            document.getElementById('productName').value = '';
+            document.getElementById('shelfLife').value = '';
+        }
+
+        function removeProduct() {
+            const selected = document.querySelector('#productList li.selected');
+            if (selected) {
+                selected.remove();
+            } else {
+                alert('Please select a product to remove');
+            }
+        }
+
+        function clearProducts() {
+            if (confirm('Clear all products?')) {
+                document.getElementById('productList').innerHTML = '';
+            }
+        }
+
+        function addDistributor() {
+            const name = document.getElementById('distName').value;
+            const policy = document.getElementById('policyDays').value;
+            const proportion = document.getElementById('proportion').value;
+            const distance = document.getElementById('distance').value;
+            
+            if (!name || !policy || !proportion || !distance) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const li = document.createElement('li');
+            li.textContent = `${name} (Policy: ${policy} days, Proportion: ${proportion}, Distance: ${distance}km)`;
+            li.onclick = function() {
+                this.classList.toggle('selected');
+            };
+            document.getElementById('distributorList').appendChild(li);
+            
+            document.getElementById('distName').value = '';
+            document.getElementById('policyDays').value = '1';
+            document.getElementById('proportion').value = '0.15';
+            document.getElementById('distance').value = '10';
+        }
+
+        function removeDistributor() {
+            const selected = document.querySelector('#distributorList li.selected');
+            if (selected) {
+                selected.remove();
+            } else {
+                alert('Please select a distributor to remove');
+            }
+        }
+
+        function clearDistributors() {
+            if (confirm('Clear all distributors?')) {
+                document.getElementById('distributorList').innerHTML = '';
+            }
+        }
+
+        function runSimulation() {
+            alert('Simulation completed! Results would be displayed here.');
+            showTab('results');
+        }
+
+        function optimizeProduction() {
+            alert('Optimization completed! Results would be displayed here.');
+            showTab('results');
+        }
+
+        function exportResults() {
+            alert('Results exported successfully!');
+        }
+    </script>
+</body>
+</html>

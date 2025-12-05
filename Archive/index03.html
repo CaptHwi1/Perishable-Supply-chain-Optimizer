@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perishable Supply Chain Enterprise Optimizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            --dark-bg: #1a1c1e;
+            --frame-bg: #262a2e;
+            --text-light: #e0e0e0;
+            --border-color: #444;
+            --card-bg: #2d3135;
+            --input-bg: #33373b;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .nav-link, .navbar-brand {
+            color: white !important;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .list-group-item {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+        
+        .day-checkbox {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Perishable Supply Chain Enterprise Optimizer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#configuration">Configuration</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#results">Results</a>
+                    </li>
+                </ul>
+                <button id="themeToggle" class="theme-toggle">☀️</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="tab-content">
+            <!-- Configuration Tab -->
+            <div class="tab-pane fade show active" id="configuration">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Global Settings</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="simDays" class="form-label">Simulation Days</label>
+                                            <input type="number" class="form-control" id="simDays" value="28" min="1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="transportRate" class="form-label">Transport Rate ($/km/unit)</label>
+                                            <input type="number" class="form-control" id="transportRate" value="0.01" step="0.001" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button id="applySettings" class="btn btn-primary">Apply Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs nav-justified mb-4" id="configTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#distributors">Distributors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#production">Production Plan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#actions">Actions</a>
+                    </li>
+                </ul>
+
+                <!-- Products Tab -->
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="products">
+                        <div class="card">
+                            <div class="card-header">Products Management</div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="productName" class="form-label">Product Name</label>
+                                            <input type="text" class="form-control" id="productName" placeholder="Enter product name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="shelfLife" class="form-label">Shelf Life (days)</label>
+                                            <input type="number" class="form-control" id="shelfLife" min="1" placeholder="e.g., 7">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button id="addProduct" class="btn btn-primary w-100">Add Product</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6>Configured Products:</h6>
+                                        <ul id="productList" class="list-group"></ul>
+                                        <div class="mt-3">
+                                            <button id="removeProduct" class="btn btn-danger btn-sm">Remove Selected</button>
+                                            <button id="clearProducts" class="btn btn-secondary btn-sm">Clear All</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distributors Tab -->
+                    <div class="tab-pane fade" id="distributors">
+                        <div class="card">
+                            <div class="card-header">Distributor Configuration</div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="distName" class="form-label">Distributor Name</label>
+                                            <input type="text" class="form-control" id="distName" placeholder="e.g., Central Market">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label for="policyDays" class="form-label">Policy (days)</label>
+                                            <input type="number" class="form-control" id="policyDays" value="1" min="1" placeholder="e.g., 3">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label for="proportion" class="form-label">Proportion</label>
+                                            <input type="number" class="form-control" id="proportion" value="0.15" min="0.01" max="1" step="0.01" placeholder="e.g., 0.2">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label for="distance" class="form-label">Distance (km)</label>
+                                            <input type="number" class="form-control" id="distance" value="10" min="1" placeholder="e.g., 25">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button id="addDistributor" class="btn btn-primary w-100">Add Distributor</button>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h6>Select products for this distributor:</h6>
+                                        <div id="productSelection" class="checkbox-grid"></div>
+                                        <div class="text-muted mt-2" id="noProductsWarning" style="display: none;">
+                                            No products configured yet. Please add products first.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h6>Purchase Schedule:</h6>
+                                        <p class="text-muted mb-2">Select the days this distributor makes purchases:</p>
+                                        <div id="daySelection" class="checkbox-grid">
+                                            <label class="day-checkbox"><input type="checkbox" value="0" checked> Monday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="1" checked> Tuesday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="2" checked> Wednesday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="3" checked> Thursday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="4" checked> Friday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="5" checked> Saturday</label>
+                                            <label class="day-checkbox"><input type="checkbox" value="6"> Sunday</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6>Configured Distributors:</h6>
+                                        <ul id="distributorList" class="list-group"></ul>
+                                        <div class="mt-3">
+                                            <button id="removeDistributor" class="btn btn-danger btn-sm">Remove Selected</button>
+                                            <button id="clearDistributors" class="btn btn-secondary btn-sm">Clear All</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Production Plan Tab -->
+                    <div class="tab-pane fade" id="production">
+                        <div class="card">
+                            <div class="card-header">Production Planning</div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="prodProduct" class="form-label">Select Product</label>
+                                            <select class="form-select" id="prodProduct">
+                                                <option value="">-- Select a product --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label for="prodDay" class="form-label">Production Day</label>
+                                            <input type="number" class="form-control" id="prodDay" min="1" placeholder="Day #">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label for="prodQty" class="form-label">Quantity</label>
+                                            <input type="number" class="form-control" id="prodQty" min="0" placeholder="Units">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button id="addProduction" class="btn btn-primary w-100">Add</button>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button id="removeProduction" class="btn btn-danger w-100">Remove</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table id="productionTable" class="table table-striped table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th scope="col"><input type="checkbox" id="selectAllProduction"></th>
+                                                <th scope="col">Product</th>
+                                                <th scope="col">Day</th>
+                                                <th scope="col">Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Tab -->
+                    <div class="tab-pane fade" id="actions">
+                        <div class="card">
+                            <div class="card-header">System Actions</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <button id="runSimulation" class="btn btn-success btn-lg w-100 mb-3 py-3">
+                                            Run Simulation
+                                        </button>
+                                        <button id="optimizeProduction" class="btn btn-info btn-lg w-100 mb-3 py-3">
+                                            Optimize Production
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button id="exportOriginal" class="btn btn-warning btn-lg w-100 mb-3 py-3">
+                                            Export Original Results
+                                        </button>
+                                        <button id="exportOptimized" class="btn btn-primary btn-lg w-100 mb-3 py-3">
+                                            Export Optimized Plan
+                                        </button>
+                                        <button id="exportAll" class="btn btn-dark btn-lg w-100 py-3">
+                                            Export All Results
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div class="tab-pane fade" id="results">
+                <div class="results-container">
+                    <ul class="nav nav-tabs nav-justified mb-4" id="resultsTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#purchases">Purchases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#waste">Waste Summary</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#batchPurchases">Batch Purchases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#inventory">Daily Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#optimization">Optimization</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#charts">Visual Analytics</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="purchases">
+                            <div class="table-responsive">
+                                <table id="purchasesTable" class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Day</th>
+                                            <th>Distributor</th>
+                                            <th>Batch_Day</th>
+                                            <th>Quantity</th>
+                                            <th>Shelf_Age</th>
+                                            <th>Policy</th>
+                                            <th>Proportion</th>
+                                            <th>Transport_Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="waste">
+                            <div class="table-responsive">
+                                <table id="wasteTable" class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Batch_Day</th>
+                                            <th>Initial</th>
+                                            <th>Waste</th>
+                                            <th>Waste_Pct_Display</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="batchPurchases">
+                            <div class="table-responsive">
+                                <table id="batchTable" class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Distributor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="inventory">
+                            <div class="table-responsive">
+                                <table id="inventoryTable" class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Day</th>
+                                            <th>Phase</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="optimization">
+                            <div class="table-responsive">
+                                <table id="optimizationTable" class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Day</th>
+                                            <th>Recommended Production</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="charts">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <canvas id="wasteByBatchChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <canvas id="wasteDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-4 mt-3">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <canvas id="salesPerProductChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <canvas id="batchPurchasesChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        const appState = {
+            products: {},
+            distributors: [],
+            transportRate: 0.01,
+            simDays: 28,
+            allResults: {},
+            optimizedProduction: {}
+        };
+
+        // Chart instances
+        const charts = {
+            wasteByBatchChart: null,
+            wasteDistributionChart: null,
+            salesPerProductChart: null,
+            batchPurchasesChart: null
+        };
+
+        // DOM Elements
+        const elements = {
+            simDays: document.getElementById('simDays'),
+            transportRate: document.getElementById('transportRate'),
+            applySettings: document.getElementById('applySettings'),
+            
+            productName: document.getElementById('productName'),
+            shelfLife: document.getElementById('shelfLife'),
+            addProduct: document.getElementById('addProduct'),
+            productList: document.getElementById('productList'),
+            removeProduct: document.getElementById('removeProduct'),
+            clearProducts: document.getElementById('clearProducts'),
+            
+            distName: document.getElementById('distName'),
+            policyDays: document.getElementById('policyDays'),
+            proportion: document.getElementById('proportion'),
+            distance: document.getElementById('distance'),
+            addDistributor: document.getElementById('addDistributor'),
+            distributorList: document.getElementById('distributorList'),
+            removeDistributor: document.getElementById('removeDistributor'),
+            clearDistributors: document.getElementById('clearDistributors'),
+            productSelection: document.getElementById('productSelection'),
+            daySelection: document.getElementById('daySelection'),
+            
+            prodProduct: document.getElementById('prodProduct'),
+            prodDay: document.getElementById('prodDay'),
+            prodQty: document.getElementById('prodQty'),
+            addProduction: document.getElementById('addProduction'),
+            removeProduction: document.getElementById('removeProduction'),
+            productionTable: document.getElementById('productionTable')?.querySelector('tbody'),
+            selectAllProduction: document.getElementById('selectAllProduction'),
+            
+            runSimulation: document.getElementById('runSimulation'),
+            optimizeProduction: document.getElementById('optimizeProduction'),
+            exportOriginal: document.getElementById('exportOriginal'),
+            exportOptimized: document.getElementById('exportOptimized'),
+            exportAll: document.getElementById('exportAll'),
+            
+            purchasesTable: document.getElementById('purchasesTable')?.querySelector('tbody'),
+            wasteTable: document.getElementById('wasteTable')?.querySelector('tbody'),
+            batchTable: document.getElementById('batchTable'),
+            inventoryTable: document.getElementById('inventoryTable')?.querySelector('tbody'),
+            optimizationTable: document.getElementById('optimizationTable')?.querySelector('tbody'),
+            
+            themeToggle: document.getElementById('themeToggle')
+        };
+
+        // Initialize the application
+        function init() {
+            if (!elements.simDays) return;
+            
+            // Set initial values
+            appState.simDays = parseInt(elements.simDays.value);
+            appState.transportRate = parseFloat(elements.transportRate.value);
+            
+            // Event listeners
+            if (elements.applySettings) elements.applySettings.addEventListener('click', applySettings);
+            if (elements.addProduct) elements.addProduct.addEventListener('click', addProduct);
+            if (elements.removeProduct) elements.removeProduct.addEventListener('click', removeProduct);
+            if (elements.clearProducts) elements.clearProducts.addEventListener('click', clearAllProducts);
+            if (elements.addDistributor) elements.addDistributor.addEventListener('click', addDistributor);
+            if (elements.removeDistributor) elements.removeDistributor.addEventListener('click', removeDistributor);
+            if (elements.clearDistributors) elements.clearDistributors.addEventListener('click', clearAllDistributors);
+            if (elements.addProduction) elements.addProduction.addEventListener('click', addProduction);
+            if (elements.removeProduction) elements.removeProduction.addEventListener('click', removeProduction);
+            if (elements.selectAllProduction) elements.selectAllProduction.addEventListener('change', toggleSelectAllProduction);
+            if (elements.runSimulation) elements.runSimulation.addEventListener('click', runSimulation);
+            if (elements.optimizeProduction) elements.optimizeProduction.addEventListener('click', optimizeProduction);
+            if (elements.exportOriginal) elements.exportOriginal.addEventListener('click', exportOriginalResults);
+            if (elements.exportOptimized) elements.exportOptimized.addEventListener('click', exportOptimizedPlan);
+            if (elements.exportAll) elements.exportAll.addEventListener('click', exportAll);
+            if (elements.themeToggle) elements.themeToggle.addEventListener('click', toggleTheme);
+            
+            updateUI();
+        }
+
+        function applySettings() {
+            if (elements.simDays && elements.transportRate) {
+                appState.simDays = parseInt(elements.simDays.value);
+                appState.transportRate = parseFloat(elements.transportRate.value);
+                updateUI();
+                showAlert('Settings applied successfully!', 'success');
+            }
+        }
+
+        function addProduct() {
+            if (!elements.productName || !elements.shelfLife) return;
+            
+            const name = elements.productName.value.trim();
+            const shelfLifeText = elements.shelfLife.value.trim();
+            
+            if (!name || !shelfLifeText) {
+                showAlert('Please enter both name and shelf life.', 'warning');
+                return;
+            }
+            
+            const shelfLife = parseInt(shelfLifeText);
+            if (shelfLife <= 0) {
+                showAlert('Shelf life must be a positive number.', 'warning');
+                return;
+            }
+            
+            if (appState.products[name]) {
+                showAlert(`Product '${name}' already exists.`, 'warning');
+                return;
+            }
+            
+            appState.products[name] = {
+                shelfLife: shelfLife,
+                productionPlan: {}
+            };
+            
+            elements.productName.value = '';
+            elements.shelfLife.value = '';
+            
+            updateUI();
+            showAlert(`Product '${name}' added successfully!`, 'success');
+        }
+
+        function removeProduct() {
+            const selected = document.querySelector('#productList .list-group-item.active');
+            if (!selected) {
+                showAlert('Please select a product to remove.', 'warning');
+                return;
+            }
+            
+            const productName = selected.dataset.name;
+            if (confirm(`Are you sure you want to delete product '${productName}'?`)) {
+                delete appState.products[productName];
+                updateUI();
+                showAlert(`Product '${productName}' has been removed.`, 'success');
+            }
+        }
+
+        function clearAllProducts() {
+            if (Object.keys(appState.products).length === 0) {
+                showAlert('No products to clear.', 'info');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to remove ALL products? This cannot be undone.')) {
+                appState.products = {};
+                updateUI();
+                showAlert('All products have been cleared.', 'success');
+            }
+        }
+
+        function addDistributor() {
+            if (!elements.distName || !elements.policyDays || !elements.proportion || !elements.distance) return;
+            
+            const name = elements.distName.value.trim();
+            const policyText = elements.policyDays.value.trim();
+            const propText = elements.proportion.value.trim();
+            const distText = elements.distance.value.trim();
+            
+            if (!name || !policyText || !propText || !distText) {
+                showAlert('Please fill in all fields.', 'warning');
+                return;
+            }
+            
+            const policy = parseInt(policyText);
+            const proportion = parseFloat(propText);
+            const distance = parseInt(distText);
+            
+            if (policy <= 0 || proportion <= 0 || proportion > 1 || distance <= 0) {
+                showAlert('Invalid values. Please check your inputs.', 'warning');
+                return;
+            }
+            
+            // Get selected products
+            const selectedProducts = [];
+            document.querySelectorAll('#productSelection input[type="checkbox"]:checked').forEach(cb => {
+                selectedProducts.push(cb.value);
+            });
+            
+            if (selectedProducts.length === 0) {
+                showAlert('Please select at least one product for this distributor.', 'warning');
+                return;
+            }
+            
+            // Get purchase days pattern
+            const purchasePattern = [];
+            for (let i = 0; i < 7; i++) {
+                const checkbox = document.querySelector(`#daySelection input[value="${i}"]`);
+                purchasePattern.push(checkbox?.checked || false);
+            }
+            
+            // Create full purchase schedule for simulation period
+            const fullPurchaseDays = [];
+            for (let day = 1; day <= appState.simDays; day++) {
+                const weekdayIndex = (day - 1) % 7;
+                fullPurchaseDays.push(purchasePattern[weekdayIndex]);
+            }
+            
+            appState.distributors.push({
+                name: name,
+                policyDays: policy,
+                proportion: Math.round(proportion * 100) / 100,
+                distanceKm: distance,
+                purchaseDays: fullPurchaseDays,
+                preferredProducts: selectedProducts
+            });
+            
+            // Reset form
+            elements.distName.value = '';
+            elements.policyDays.value = '1';
+            elements.proportion.value = '0.15';
+            elements.distance.value = '10';
+            
+            // Reset checkboxes
+            document.querySelectorAll('#productSelection input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            updateUI();
+            showAlert(`Distributor '${name}' added successfully!`, 'success');
+        }
+
+        function removeDistributor() {
+            const selected = document.querySelector('#distributorList .list-group-item.active');
+            if (!selected) {
+                showAlert('Please select a distributor to remove.', 'warning');
+                return;
+            }
+            
+            const index = parseInt(selected.dataset.index);
+            const distName = selected.textContent.split(' ')[0];
+            
+            if (confirm(`Are you sure you want to delete distributor '${distName}'?`)) {
+                appState.distributors.splice(index, 1);
+                updateUI();
+                showAlert(`Distributor '${distName}' has been removed.`, 'success');
+            }
+        }
+
+        function clearAllDistributors() {
+            if (appState.distributors.length === 0) {
+                showAlert('No distributors to clear.', 'info');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to remove ALL distributors? This cannot be undone.')) {
+                appState.distributors = [];
+                updateUI();
+                showAlert('All distributors have been cleared.', 'success');
+            }
+        }
+
+        function addProduction() {
+            if (!elements.prodProduct || !elements.prodDay || !elements.prodQty || !elements.productionTable) return;
+            
+            const productName = elements.prodProduct.value;
+            const dayText = elements.prodDay.value.trim();
+            const qtyText = elements.prodQty.value.trim();
+            
+            if (!productName) {
+                showAlert('Please select a product.', 'warning');
+                return;
+            }
+            
+            if (!dayText || !qtyText) {
+                showAlert('Please enter both day and quantity.', 'warning');
+                return;
+            }
+            
+            const day = parseInt(dayText);
+            const qty = parseFloat(qtyText);
+            
+            if (day < 1 || qty < 0) {
+                showAlert('Invalid input. Day must be positive and quantity non-negative.', 'warning');
+                return;
+            }
+            
+            if (!appState.products[productName]) {
+                showAlert('Product not found.', 'error');
+                return;
+            }
+            
+            appState.products[productName].productionPlan[day] = qty;
+            
+            // Add to table
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="checkbox" class="select-row"></td>
+                <td>${productName}</td>
+                <td>${day}</td>
+                <td>${Math.round(qty)}</td>
+            `;
+            row.addEventListener('click', function(e) {
+                if (e.target.type !== 'checkbox') {
+                    this.classList.toggle('table-active');
+                    const checkbox = this.querySelector('.select-row');
+                    checkbox.checked = !checkbox.checked;
+                }
+            });
+            elements.productionTable.appendChild(row);
+            
+            // Clear form
+            elements.prodDay.value = '';
+            elements.prodQty.value = '';
+            
+            showAlert(`Production added for ${productName} on day ${day}.`, 'success');
+        }
+
+        function removeProduction() {
+            const selectedRows = document.querySelectorAll('#productionTable tbody tr.table-active');
+            if (selectedRows.length === 0) {
+                showAlert('Please select a production entry to remove.', 'warning');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to remove ${selectedRows.length} production entry(s)?`)) {
+                selectedRows.forEach(row => {
+                    const cells = row.getElementsByTagName('td');
+                    const productName = cells[1].textContent;
+                    const day = parseInt(cells[2].textContent);
+                    
+                    if (appState.products[productName] && 
+                        appState.products[productName].productionPlan[day]) {
+                        delete appState.products[productName].productionPlan[day];
+                    }
+                    
+                    row.remove();
+                });
+                
+                showAlert('Selected production entries removed.', 'success');
+            }
+        }
+
+        function toggleSelectAllProduction() {
+            const isChecked = elements.selectAllProduction.checked;
+            const rows = document.querySelectorAll('#productionTable tbody tr');
+            const checkboxes = document.querySelectorAll('#productionTable tbody .select-row');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            
+            rows.forEach(row => {
+                if (isChecked) {
+                    row.classList.add('table-active');
+                } else {
+                    row.classList.remove('table-active');
+                }
+            });
+        }
+
+        function runSimulation() {
+            // Validation
+            if (Object.keys(appState.products).length === 0) {
+                showAlert('Please add at least one product.', 'error');
+                return;
+            }
+            
+            for (const [name, data] of Object.entries(appState.products)) {
+                if (Object.keys(data.productionPlan).length === 0) {
+                    showAlert(`Please add production for ${name}.`, 'error');
+                    return;
+                }
+            }
+            
+            if (appState.distributors.length === 0) {
+                showAlert('Please add at least one distributor.', 'error');
+                return;
+            }
+            
+            try {
+                // Run simulation
+                appState.allResults = simulateSupplyChain();
+                displayResults();
+                showAlert('Simulation completed successfully!', 'success');
+            } catch (error) {
+                showAlert(`Simulation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateSupplyChain() {
+            const results = {};
+            
+            // Process each product
+            for (const [prodName, prodData] of Object.entries(appState.products)) {
+                const shelfLife = prodData.shelfLife;
+                const productionPlan = prodData.productionPlan;
+                const totalDays = appState.simDays;
+                
+                const batches = {};
+                const purchases = [];
+                const inventoryLog = [];
+                const waste = {};
+                
+                // Simulate day-by-day
+                for (let currentDay = 1; currentDay <= totalDays; currentDay++) {
+                    // Add new batch if produced today
+                    if (currentDay in productionPlan && productionPlan[currentDay] > 0) {
+                        const qty = productionPlan[currentDay];
+                        batches[currentDay] = {
+                            initial: qty,
+                            current: qty,
+                            expiry: currentDay + shelfLife - 1
+                        };
+                    }
+                    
+                    // Log inventory at start
+                    const logEntry = { Day: currentDay, Phase: 'Start' };
+                    for (const bDay of Object.keys(batches).sort((a, b) => parseInt(a) - parseInt(b))) {
+                        logEntry[`Q${bDay}`] = Math.round(batches[bDay].current);
+                    }
+                    inventoryLog.push(logEntry);
+                    
+                    // Remove expired batches
+                    const expiredDays = Object.keys(batches).filter(pDay => 
+                        batches[pDay].expiry === currentDay
+                    );
+                    for (const pDay of expiredDays) {
+                        const finalQty = batches[pDay].current;
+                        waste[pDay] = finalQty;
+                        delete batches[pDay];
+                    }
+                    
+                    // Sort distributors by policy days (precedence)
+                    const sortedDistributors = [...appState.distributors].sort(
+                        (a, b) => a.policyDays - b.policyDays
+                    );
+                    
+                    // Process each distributor
+                    for (const dist of sortedDistributors) {
+                        // Skip if distributor doesn't carry this product
+                        if (!dist.preferredProducts.includes(prodName)) continue;
+                        
+                        // Skip if not a purchase day or it's Sunday
+                        if (currentDay > dist.purchaseDays.length || 
+                            !dist.purchaseDays[currentDay - 1] || 
+                            currentDay % 7 === 0) {
+                            continue;
+                        }
+                        
+                        // Find valid batches (age < policy and still in inventory)
+                        const validBatches = {};
+                        for (const [pDay, batch] of Object.entries(batches)) {
+                            if ((currentDay - parseInt(pDay)) < dist.policyDays && batch.current > 0) {
+                                validBatches[pDay] = batch;
+                            }
+                        }
+                        
+                        if (Object.keys(validBatches).length === 0) continue;
+                        
+                        // Calculate total available from valid batches
+                        const totalAvailable = Object.values(validBatches)
+                            .reduce((sum, batch) => sum + batch.current, 0);
+                        const totalPurchase = Math.round(dist.proportion * totalAvailable);
+                        
+                        // Distribute purchase across valid batches
+                        let remainingPurchase = totalPurchase;
+                        const sortedBatchEntries = Object.entries(validBatches).sort(
+                            (a, b) => parseInt(a[0]) - parseInt(b[0])
+                        );
+                        
+                        // Distribute to all but the last batch
+                        for (let i = 0; i < sortedBatchEntries.length - 1; i++) {
+                            const [pDay, batch] = sortedBatchEntries[i];
+                            const share = Math.round((batch.current / totalAvailable) * totalPurchase);
+                            const actualShare = Math.min(share, batch.current, remainingPurchase);
+                            
+                            if (actualShare > 0) {
+                                batch.current -= actualShare;
+                                remainingPurchase -= actualShare;
+                                
+                                const transportCost = actualShare * dist.distanceKm * appState.transportRate;
+                                
+                                purchases.push({
+                                    Product: prodName,
+                                    Day: currentDay,
+                                    Distributor: dist.name,
+                                    Batch_Day: parseInt(pDay),
+                                    Quantity: actualShare,
+                                    Shelf_Age: currentDay - parseInt(pDay),
+                                    Policy: dist.policyDays,
+                                    Proportion: dist.proportion,
+                                    Transport_Cost: transportCost
+                                });
+                            }
+                        }
+                        
+                        // Give remainder to the last batch
+                        if (sortedBatchEntries.length > 0) {
+                            const [pDay, batch] = sortedBatchEntries[sortedBatchEntries.length - 1];
+                            const finalShare = Math.min(remainingPurchase, batch.current);
+                            
+                            if (finalShare > 0) {
+                                batch.current -= finalShare;
+                                
+                                const transportCost = finalShare * dist.distanceKm * appState.transportRate;
+                                
+                                purchases.push({
+                                    Product: prodName,
+                                    Day: currentDay,
+                                    Distributor: dist.name,
+                                    Batch_Day: parseInt(pDay),
+                                    Quantity: finalShare,
+                                    Shelf_Age: currentDay - parseInt(pDay),
+                                    Policy: dist.policyDays,
+                                    Proportion: dist.proportion,
+                                    Transport_Cost: transportCost
+                                });
+                            }
+                        }
+                        
+                        // Remove empty batches
+                        for (const pDay of Object.keys(validBatches)) {
+                            if (batches[pDay]?.current <= 0) {
+                                delete batches[pDay];
+                            }
+                        }
+                    }
+                    
+                    // Log after transactions
+                    const logEntryEnd = { Day: currentDay, Phase: 'End' };
+                    for (const bDay of Object.keys(batches).sort((a, b) => parseInt(a) - parseInt(b))) {
+                        logEntryEnd[`Q${bDay}`] = Math.round(batches[bDay].current);
+                    }
+                    inventoryLog.push(logEntryEnd);
+                }
+                
+                // Compile results
+                const wasteData = [];
+                for (let day = 1; day <= totalDays; day++) {
+                    const initial = productionPlan[day] || 0;
+                    const expired = waste[day] || 0;
+                    const wastePct = initial > 0 ? (expired / initial) * 100 : 0;
+                    
+                    wasteData.push({
+                        Product: prodName,
+                        Batch_Day: day,
+                        Initial: initial,
+                        Waste: expired,
+                        Waste_Pct: Math.round(wastePct * 100) / 100,
+                        Waste_Pct_Display: `${Math.round(wastePct * 100) / 100}%`
+                    });
+                }
+                
+                // Create batch pivot table
+                let batchPivot = {};
+                if (purchases.length > 0) {
+                    // Group by distributor and batch day
+                    const pivotData = {};
+                    for (const purchase of purchases) {
+                        const key = `${purchase.Distributor}_${purchase.Batch_Day}`;
+                        if (!pivotData[key]) {
+                            pivotData[key] = {
+                                Distributor: purchase.Distributor,
+                                Batch_Day: purchase.Batch_Day,
+                                Quantity: 0
+                            };
+                        }
+                        pivotData[key].Quantity += purchase.Quantity;
+                    }
+                    
+                    // Convert to pivot format
+                    for (const item of Object.values(pivotData)) {
+                        if (!batchPivot[item.Distributor]) {
+                            batchPivot[item.Distributor] = {};
+                        }
+                        batchPivot[item.Distributor][item.Batch_Day] = item.Quantity;
+                    }
+                }
+                
+                results[prodName] = {
+                    purchases: purchases,
+                    waste: wasteData,
+                    batchPivot: batchPivot,
+                    inventoryLog: inventoryLog
+                };
+            }
+            
+            return results;
+        }
+
+        function optimizeProduction() {
+            if (Object.keys(appState.products).length === 0 || appState.distributors.length === 0) {
+                showAlert('Please configure products and distributors first.', 'warning');
+                return;
+            }
+            
+            try {
+                // Use first product for optimization
+                const firstProduct = Object.keys(appState.products)[0];
+                const shelfLife = appState.products[firstProduct].shelfLife;
+                const simDays = appState.simDays;
+                
+                // Simple LP-inspired optimization
+                const recommendation = {};
+                const weeklyDemand = appState.distributors.reduce((sum, dist) => 
+                    sum + dist.proportion, 0);
+                
+                // Basic recommendation: produce enough to meet expected demand
+                for (let day = 1; day <= simDays; day++) {
+                    // No production on Sundays
+                    if (day % 7 === 0) {
+                        recommendation[day] = 0;
+                    } else {
+                        // Base production level
+                        let baseProd = 10000; // Starting point
+                        
+                        // Adjust based on nearby production days
+                        let adjustment = 0;
+                        for (let offset = -3; offset <= 3; offset++) {
+                            if (offset !== 0 && day + offset >= 1 && day + offset <= simDays) {
+                                adjustment += (recommendation[day + offset] || 0) * 0.1;
+                            }
+                        }
+                        
+                        // Final recommendation
+                        recommendation[day] = Math.max(0, Math.round(baseProd - adjustment));
+                    }
+                }
+                
+                appState.optimizedProduction = { [firstProduct]: recommendation };
+                
+                // Display in table
+                if (elements.optimizationTable) {
+                    elements.optimizationTable.innerHTML = '';
+                    for (const [day, qty] of Object.entries(recommendation)) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${day}</td><td>${qty}</td>`;
+                        elements.optimizationTable.appendChild(row);
+                    }
+                }
+                
+                showAlert('Production optimization completed!', 'success');
+            } catch (error) {
+                showAlert(`Optimization failed: ${error.message}`, 'error');
+            }
+        }
+
+        function displayResults() {
+            // Combine all purchases
+            const allPurchases = [];
+            for (const [prodName, data] of Object.entries(appState.allResults)) {
+                allPurchases.push(...data.purchases);
+            }
+            
+            // Populate purchases table
+            if (elements.purchasesTable) {
+                elements.purchasesTable.innerHTML = '';
+                allPurchases.forEach(purchase => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${purchase.Product}</td>
+                        <td>${purchase.Day}</td>
+                        <td>${purchase.Distributor}</td>
+                        <td>${purchase.Batch_Day}</td>
+                        <td>${purchase.Quantity}</td>
+                        <td>${purchase.Shelf_Age}</td>
+                        <td>${purchase.Policy}</td>
+                        <td>${purchase.Proportion.toFixed(2)}</td>
+                        <td>${purchase.Transport_Cost.toFixed(2)}</td>
+                    `;
+                    elements.purchasesTable.appendChild(row);
+                });
+            }
+            
+            // Combine all waste
+            const allWaste = [];
+            for (const [prodName, data] of Object.entries(appState.allResults)) {
+                allWaste.push(...data.waste);
+            }
+            
+            // Populate waste table
+            if (elements.wasteTable) {
+                elements.wasteTable.innerHTML = '';
+                allWaste.forEach(waste => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${waste.Product}</td>
+                        <td>${waste.Batch_Day}</td>
+                        <td>${waste.Initial}</td>
+                        <td>${waste.Waste}</td>
+                        <td>${waste.Waste_Pct_Display}</td>
+                    `;
+                    elements.wasteTable.appendChild(row);
+                });
+            }
+            
+            // First product's batch pivot
+            if (Object.keys(appState.allResults).length > 0 && elements.batchTable) {
+                const firstProd = Object.keys(appState.allResults)[0];
+                const batchPivot = appState.allResults[firstProd].batchPivot;
+                
+                // Clear existing table
+                elements.batchTable.innerHTML = '<thead class="table-dark"><tr><th>Distributor</th></tr></thead><tbody></tbody>';
+                const thead = elements.batchTable.querySelector('thead tr');
+                const tbody = elements.batchTable.querySelector('tbody');
+                
+                // Get all batch days
+                const allBatchDays = new Set();
+                for (const distData of Object.values(batchPivot)) {
+                    for (const day of Object.keys(distData)) {
+                        allBatchDays.add(parseInt(day));
+                    }
+                }
+                
+                // Sort batch days
+                const sortedBatchDays = Array.from(allBatchDays).sort((a, b) => a - b);
+                
+                // Add batch day headers
+                for (const day of sortedBatchDays) {
+                    const th = document.createElement('th');
+                    th.textContent = `Day ${day}`;
+                    thead.appendChild(th);
+                }
+                
+                // Add distributor rows
+                for (const [distName, distData] of Object.entries(batchPivot)) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${distName}</td>`;
+                    
+                    for (const day of sortedBatchDays) {
+                        const qty = distData[day] || 0;
+                        const td = document.createElement('td');
+                        td.textContent = qty;
+                        row.appendChild(td);
+                    }
+                    
+                    tbody.appendChild(row);
+                }
+                
+                // Daily inventory
+                if (elements.inventoryTable) {
+                    const inventoryLog = appState.allResults[firstProd].inventoryLog;
+                    elements.inventoryTable.innerHTML = '';
+                    inventoryLog.forEach(entry => {
+                        const row = document.createElement('tr');
+                        
+                        // Add Day and Phase columns
+                        let rowHtml = `<td>${entry.Day}</td><td>${entry.Phase}</td>`;
+                        
+                        // Add Q columns in order
+                        const qColumns = Object.keys(entry).filter(key => key.startsWith('Q'));
+                        qColumns.sort((a, b) => parseInt(a.slice(1)) - parseInt(b.slice(1)));
+                        
+                        for (const col of qColumns) {
+                            rowHtml += `<td>${entry[col]}</td>`;
+                        }
+                        
+                        row.innerHTML = rowHtml;
+                        elements.inventoryTable.appendChild(row);
+                    });
+                }
+            }
+            
+            // Update charts
+            updateCharts();
+        }
+
+        function updateCharts() {
+            // Get all waste data
+            const allWaste = [];
+            for (const [prodName, data] of Object.entries(appState.allResults)) {
+                allWaste.push(...data.waste);
+            }
+            
+            if (allWaste.length === 0) return;
+            
+            // Destroy existing charts safely
+            destroyChart('wasteByBatchChart');
+            destroyChart('wasteDistributionChart');
+            destroyChart('salesPerProductChart');
+            destroyChart('batchPurchasesChart');
+            
+            // Waste by batch chart
+            const wasteByBatchCtx = document.getElementById('wasteByBatchChart')?.getContext('2d');
+            if (wasteByBatchCtx) {
+                const batchDays = allWaste.map(w => w.Batch_Day);
+                const wasteAmounts = allWaste.map(w => w.Waste);
+                
+                charts.wasteByBatchChart = new Chart(wasteByBatchCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: batchDays,
+                        datasets: [{
+                            label: 'Waste Amount',
+                            data: wasteAmounts,
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Waste by Batch'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Waste Amount'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Production Day'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Waste distribution pie chart
+            const wasteDistributionCtx = document.getElementById('wasteDistributionChart')?.getContext('2d');
+            if (wasteDistributionCtx) {
+                const wasteLabels = allWaste.map(w => `Day ${w.Batch_Day}`);
+                const wasteValues = allWaste.map(w => w.Waste);
+                
+                charts.wasteDistributionChart = new Chart(wasteDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: wasteLabels,
+                        datasets: [{
+                            data: wasteValues,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 205, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Waste Distribution (%)'
+                            },
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Total sales per product
+            const salesPerProductCtx = document.getElementById('salesPerProductChart')?.getContext('2d');
+            if (salesPerProductCtx) {
+                const productSales = {};
+                for (const [prodName, data] of Object.entries(appState.allResults)) {
+                    const totalSales = data.purchases.reduce((sum, p) => sum + p.Quantity, 0);
+                    productSales[prodName] = totalSales;
+                }
+                
+                const productNames = Object.keys(productSales);
+                const salesValues = Object.values(productSales);
+                
+                charts.salesPerProductChart = new Chart(salesPerProductCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: productNames,
+                        datasets: [{
+                            label: 'Total Sales',
+                            data: salesValues,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Total Sales per Product'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Quantity Sold'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Batch purchases chart
+            const batchPurchasesCtx = document.getElementById('batchPurchasesChart')?.getContext('2d');
+            if (batchPurchasesCtx && Object.keys(appState.allResults).length > 0) {
+                const firstProd = Object.keys(appState.allResults)[0];
+                const batchPivot = appState.allResults[firstProd].batchPivot;
+                
+                const distributors = Object.keys(batchPivot);
+                const batchDays = new Set();
+                for (const distData of Object.values(batchPivot)) {
+                    for (const day of Object.keys(distData)) {
+                        batchDays.add(parseInt(day));
+                    }
+                }
+                
+                const sortedDays = Array.from(batchDays).sort((a, b) => a - b);
+                
+                const datasets = distributors.map(distName => {
+                    const data = sortedDays.map(day => batchPivot[distName][day] || 0);
+                    return {
+                        label: distName,
+                        data: data,
+                        backgroundColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                    };
+                });
+                
+                charts.batchPurchasesChart = new Chart(batchPurchasesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedDays.map(d => `Day ${d}`),
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Batch Purchases'
+                            },
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Batch Day'
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Quantity'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Safe chart destruction
+        function destroyChart(chartKey) {
+            if (charts[chartKey] && typeof charts[chartKey].destroy === 'function') {
+                try {
+                    charts[chartKey].destroy();
+                    charts[chartKey] = null;
+                } catch (error) {
+                    console.warn(`Error destroying chart ${chartKey}:`, error);
+                }
+            }
+        }
+
+        // Export functions
+        function exportOriginalResults() {
+            if (Object.keys(appState.allResults).length === 0) {
+                showAlert('Please run the simulation first.', 'warning');
+                return;
+            }
+            
+            showAlert('Original results exported successfully!', 'success');
+        }
+
+        function exportOptimizedPlan() {
+            if (!appState.optimizedProduction || Object.keys(appState.optimizedProduction).length === 0) {
+                showAlert('Please run optimization first.', 'warning');
+                return;
+            }
+            
+            showAlert('Optimized plan exported successfully!', 'success');
+        }
+
+        function exportAll() {
+            if (Object.keys(appState.allResults).length === 0) {
+                showAlert('Please run the simulation first.', 'warning');
+                return;
+            }
+            
+            showAlert('All results exported successfully!', 'success');
+        }
+
+        // UI update functions
+        function updateUI() {
+            // Update product dropdown in production tab
+            if (elements.prodProduct) {
+                elements.prodProduct.innerHTML = '<option value="">-- Select a product --</option>';
+                for (const name of Object.keys(appState.products)) {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    elements.prodProduct.appendChild(option);
+                }
+            }
+            
+            // Update product selection for distributors
+            if (elements.productSelection) {
+                elements.productSelection.innerHTML = '';
+                if (Object.keys(appState.products).length === 0) {
+                    if (document.getElementById('noProductsWarning')) {
+                        document.getElementById('noProductsWarning').style.display = 'block';
+                    }
+                } else {
+                    if (document.getElementById('noProductsWarning')) {
+                        document.getElementById('noProductsWarning').style.display = 'none';
+                    }
+                    for (const name of Object.keys(appState.products)) {
+                        const div = document.createElement('div');
+                        div.className = 'day-checkbox';
+                        div.innerHTML = `
+                            <input type="checkbox" value="${name}">
+                            <span>${name}</span>
+                        `;
+                        elements.productSelection.appendChild(div);
+                    }
+                }
+            }
+            
+            // Update product list
+            if (elements.productList) {
+                elements.productList.innerHTML = '';
+                for (const [name, data] of Object.entries(appState.products)) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.dataset.name = name;
+                    li.textContent = `${name} (Shelf Life: ${data.shelfLife} days)`;
+                    li.addEventListener('click', function() {
+                        document.querySelectorAll('#productList .list-group-item').forEach(el => {
+                            el.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                    elements.productList.appendChild(li);
+                }
+            }
+            
+            // Update distributor list
+            if (elements.distributorList) {
+                elements.distributorList.innerHTML = '';
+                appState.distributors.forEach((dist, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.dataset.index = index;
+                    li.textContent = `${dist.name} (Policy: ${dist.policyDays} days, ${dist.preferredProducts.length} product${dist.preferredProducts.length !== 1 ? 's' : ''})`;
+                    li.addEventListener('click', function() {
+                        document.querySelectorAll('#distributorList .list-group-item').forEach(el => {
+                            el.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                    elements.distributorList.appendChild(li);
+                });
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            // Create temporary alert element
+            const alert = document.createElement('div');
+            const alertTypes = {
+                success: 'alert-success',
+                warning: 'alert-warning',
+                error: 'alert-danger',
+                info: 'alert-info'
+            };
+            
+            alert.className = `alert ${alertTypes[type] || 'alert-info'} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x m-3`;
+            alert.style.zIndex = '10000';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 4000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
